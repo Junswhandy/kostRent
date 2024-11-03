@@ -1,13 +1,15 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Illuminate\Auth\Events\Registered;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
-
+use Illuminate\Validation\Rules;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Auth;
 class UserController extends Controller
 {
     // Menampilkan semua user
@@ -24,54 +26,48 @@ class UserController extends Controller
     }
 
     // Menyimpan user baru
-    public function store(Request $request)
+    public function store(Request $request): RedirectResponse
     {
-        // Validasi data input
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
-            'level' => 'required|in:user,admin,owner',
-            'no_hp' => 'nullable|string|max:255',
-            'pekerjaan' => 'nullable|string|max:255',
-            'jenis_kelamin' => 'nullable|in:laki-laki,perempuan',
-            'foto_profil' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Validasi gambar
-            'id_kost' => 'nullable|integer|exists:kost,id_kost',
+        $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
+            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'no_hp' => ['required', 'string', 'max:15'],
+            'pekerjaan' => ['required', 'string', 'max:255'],
+            'jenis_kelamin' => ['required', 'in:laki-laki,perempuan'],
+            'foto_profil' => ['required', 'image', 'max:2048'],
+            'level' => ['required', 'in:admin,user,owner'], // Validation for level
         ]);
 
-        if ($validator->fails()) {
-            return redirect()->back()->withErrors($validator)->withInput();
-        }
-
-        // Menyimpan user baru
-        $user = new User;
-        $user->name = $request->name;
-        $user->email = $request->email;
-        $user->password = Hash::make($request->password);
-        $user->level = $request->level;
-        $user->no_hp = $request->no_hp;
-        $user->pekerjaan = $request->pekerjaan;
-        $user->jenis_kelamin = $request->jenis_kelamin;
-        $user->id_kost = $request->id_kost;
-
-        // Jika ada file foto_profil yang diupload
+        // Handle file upload for foto_profil
+        $path = null;
         if ($request->hasFile('foto_profil')) {
-            $file = $request->file('foto_profil');
-            $filename = time() . '_' . $file->getClientOriginalName();
-            $file->storeAs('public/foto_profil', $filename); // Simpan gambar ke folder storage
-            $user->foto_profil = $filename; // Simpan nama file di database
+            $path = $request->file('foto_profil')->store('profile_photos', 'public');
         }
 
-        $user->save();
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'no_hp' => $request->no_hp,
+            'pekerjaan' => $request->pekerjaan,
+            'jenis_kelamin' => $request->jenis_kelamin,
+            'foto_profil' => $path,
+            'level' => $request->level, // Save the selected level
+        ]);
 
-        return redirect()->route('admin.user')->with('success', 'User berhasil ditambahkan');
+        event(new Registered($user));
+
+        Auth::login($user);
+
+        return redirect(route('admin.user', absolute: true));
     }
 
     // Menampilkan form edit untuk user
     public function edit($id)
     {
         $user = User::findOrFail($id); // Cari user berdasarkan id
-        return view('admin.user.edit', compact('user')); // Return view edit dengan data user
+        return view('admin.userEdit', compact('user')); // Return view edit dengan data user
     }
 
     // Mengupdate data user
@@ -83,7 +79,7 @@ class UserController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $id,
-            'password' => 'nullable|string|min:8|confirmed',
+            'password' => 'nullable|string|min:8|',
             'level' => 'required|in:user,admin,owner',
             'no_hp' => 'nullable|string|max:255',
             'pekerjaan' => 'nullable|string|max:255',
@@ -111,14 +107,17 @@ class UserController extends Controller
         // Jika ada file foto_profil yang diupload
         if ($request->hasFile('foto_profil')) {
             // Hapus foto profil lama jika ada
-            if ($user->foto_profil) {
-                Storage::delete('public/foto_profil/' . $user->foto_profil);
+            if ($user->foto_profil && Storage::exists('public/' . $user->foto_profil)) {
+                Storage::delete('public/' . $user->foto_profil); // Delete the old profile photo if it exists
             }
+            $path = null;
+            // Simpan foto profil baru
+            $filename = time() . '_' . $request->file('foto_profil')->getClientOriginalName(); // Nama file baru
+            $path = $request->file('foto_profil')->storeAs('profile_photos', $filename, 'public'); // Simpan gambar dengan nama baru
 
-            $file = $request->file('foto_profil');
-            $filename = time() . '_' . $file->getClientOriginalName();
-            $file->storeAs('public/foto_profil', $filename); // Simpan gambar baru
-            $user->foto_profil = $filename; // Update nama file di database
+            // Update nama file di database dengan path yang diinginkan
+            $user->foto_profil = 'profile_photos/' . $filename; // Simpan path ke database
+            $user->save(); // Pastikan untuk menyimpan perubahan ke database
         }
 
         $user->save();

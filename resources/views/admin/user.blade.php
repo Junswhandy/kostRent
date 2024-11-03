@@ -59,11 +59,14 @@
                     <td class="border px-4 py-2">{{ ucfirst($user->jenis_kelamin ?? '-') }}</td>
                     <td class="border px-4 py-2">
                         @if($user->foto_profil)
-                            <img src="{{ asset('storage/foto_profil/' . $user->foto_profil) }}" alt="Foto Profil" class="w-12 h-12 rounded-full">
+                            <img src="{{ asset('storage/' . $user->foto_profil) }}" alt="Foto Profil" class="w-12 h-12 rounded-full">
                         @else
                             Tidak ada foto
                         @endif
                     </td>
+                    
+                    
+                    
                     <td class="border px-4 py-2">
                         <a href="{{ route('admin.user.edit', $user->id) }}" class="bg-blue-500 text-white px-4 py-2 rounded">Edit</a>
                         <form action="{{ route('admin.user.destroy', $user->id) }}" method="POST" class="inline-block">

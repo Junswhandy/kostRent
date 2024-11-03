@@ -1,15 +1,12 @@
 <?php
-
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
     /**
@@ -21,6 +18,11 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'no_hp',
+        'pekerjaan',
+        'jenis_kelamin',
+        'foto_profil',
+        'level',
     ];
 
     /**
@@ -34,7 +36,7 @@ class User extends Authenticatable
     ];
 
     /**
-     * Get the attributes that should be cast.
+     * The attributes that should be cast.
      *
      * @return array<string, string>
      */
@@ -46,11 +48,10 @@ class User extends Authenticatable
         ];
     }
 
-    // File: app/Models/User.php
     public function rentedKost()
     {
-        return $this->belongsTo(kost::class, 'kost_id');
+        return $this->belongsTo(Kost::class, 'kost_id');
     }
-
 }
+
 

@@ -52,6 +52,11 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Kost::class, 'kost_id');
     }
+
+    public function kost()
+    {
+        return $this->hasMany(Kost::class, 'id_pemilik');
+    }
 }
 
 

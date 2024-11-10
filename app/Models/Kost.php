@@ -9,9 +9,11 @@ class Kost extends Model
 {
     use HasFactory;
 
-    protected $table = 'kost'; // Nama tabel di database
+    protected $table = 'kost'; // Mengatur nama tabel menjadi 'kost'
 
-    // Kolom yang dapat diisi (mass assignable)
+    protected $primaryKey = 'id_kost'; // Set primary key menjadi 'id_kost'
+
+    // Kolom yang dapat diisi melalui mass assignment
     protected $fillable = [
         'nama_kost',
         'tipe_kost',
@@ -35,6 +37,11 @@ class Kost extends Model
         'deskripsi',
         'id_pemilik',
         'fasilitas_kost',
-        'link_gmaps'
+        'link_gmaps',
     ];
+
+    public function pemilik()
+    {
+        return $this->belongsTo(Login::class, 'id_pemilik');
+    }
 }

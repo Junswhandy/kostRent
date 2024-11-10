@@ -91,3 +91,27 @@ Route::post('/admin/user', [UserController::class, 'store'])->name('admin.user.s
 
 // Route::get('/user/kost', [userKostController::class, 'showRentedKost'])->name('user.kost')->middleware('auth');
 Route::get('/user/kost', [userKostController::class, 'showRentedKost'])->name('user.kost');
+
+
+
+// owner role
+Route::get('/owner/kost', [KostController::class, 'index'])->name('kost.index');
+
+// Route untuk form tambah kost
+Route::get('/owner/kost/create', [KostController::class, 'create'])->name('kost.create');
+
+// Route untuk menyimpan data kost baru
+Route::post('/owner/kost', [KostController::class, 'store'])->name('kost.store');
+
+// Route untuk form edit kost
+Route::get('/owner/kost/{id}/edit', [KostController::class, 'edit'])->name('kost.edit');
+
+// Route untuk update data kost
+Route::put('/owner/kost/{id}', [KostController::class, 'update'])->name('kost.update');
+
+Route::delete('/kost/{kost}', [KostController::class, 'destroy'])->name('kost.destroy');
+
+
+
+
+Route::get('/owner/user', [UserController::class, 'index'])->name('owner.user');

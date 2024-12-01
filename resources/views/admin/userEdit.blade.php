@@ -8,12 +8,12 @@
 </head>
 <body class="flex min-h-screen">
     <!-- Sidebar -->
-    <div class="w-64">
+    <aside class="w-60 text-white fixed h-full">
         @include('admin.template.sidebar')
-    </div>
+    </aside>
 
   
-<div class="container mx-auto px-4">
+<div class="container mx-auto ml-60 p-4 bg-white overflow-y-auto">
     <h2 class="text-2xl font-bold mb-6">Edit User</h2>
 
     <!-- Form untuk mengedit data user -->

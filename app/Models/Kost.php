@@ -40,8 +40,21 @@ class Kost extends Model
         'link_gmaps',
     ];
 
+    // Relasi ke tabel pemilik (Login model)
     public function pemilik()
     {
         return $this->belongsTo(Login::class, 'id_pemilik');
+    }
+
+    // Relasi ke tabel booking
+    public function bookings()
+    {
+        return $this->hasMany(Booking::class, 'id_kost', 'id_kost'); // Sesuaikan kolom kunci asing
+    }
+
+    // Jika satu kost hanya dapat memiliki satu booking untuk user tertentu
+    public function booking()
+    {
+        return $this->hasOne(Booking::class, 'id_kost', 'id_kost'); // Untuk hubungan satu ke satu
     }
 }

@@ -4,20 +4,99 @@ namespace App\Http\Controllers;
 
 use App\Models\Kost;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth; // Add this line
+use Illuminate\Support\Facades\Auth;
 
 class KostController extends Controller
 {
+
+
+    // untuk admin
+    public function indexAdmin()
+    {
+        // Mendapatkan semua data kost tanpa filter id pemilik
+        $kost = Kost::all();
+
+        // Mengembalikan view dengan data kost untuk admin
+        return view('admin.kost', compact('kost'));
+    }
+
+
+    // fungsi untuk filtering
+    public function indexUser(Request $request)
+    {
+        // Inisialisasi query Kost
+        $kostQuery = Kost::query();
+
+        // Filter berdasarkan harga
+        if ($request->filled('harga')) {
+            $kostQuery->where('harga_sewa', '<=', $request->input('harga'));
+        }
+
+        // Filter berdasarkan jenis kost
+        if ($request->filled('jenis_kost')) {
+            $kostQuery->where('jenis_kost', $request->input('jenis_kost'));
+        }
+
+        // Filter berdasarkan kota
+        if ($request->filled('kota')) {
+            $kostQuery->where('kota', 'like', '%' . $request->input('kota') . '%');
+        }
+
+        // Ambil data kost sesuai filter
+        $kost = $kostQuery->get();
+
+        // Kembalikan view ke user.dashboard dengan data kost
+        return view('user.dashboard', compact('kost'));
+    }
+
+
+
+    // untuk owner
+    public function index1()
+    {
+        // Mendapatkan data kost yang dimiliki oleh pemilik yang sedang login
+        $kost = Kost::where('id_pemilik', auth()->user()->id)->get();
+
+        // Mengembalikan view dengan data kost
+        return view('owner.kost', compact('kost'));
+    }
+
+
     // Menampilkan daftar kost milik pemilik tertentu
     public function index()
     {
+        // Ambil data kost berdasarkan id pemilik yang sedang login
         $kost = Kost::where('id_pemilik', auth()->user()->id)->get();
-        return view('owner.kost', compact('kost'));
+
+        // Mengembalikan view dengan data kost
+        return view('owner.dashboard', compact('kost'));
     }
+
+
+    public function show($id)
+    {
+        // Ambil data kost berdasarkan ID
+        $kost = Kost::findOrFail($id);
+
+        // Menampilkan tampilan detail kost
+        return view('owner.kost.show', compact('kost'));
+    }
+
+    public function showUser($id)
+    {
+        // Ambil data kost berdasarkan ID
+        $kost = Kost::findOrFail($id);
+
+        // Menampilkan tampilan detail kost
+        return view('user.kost.show', compact('kost'));
+    }
+
+
 
     // Menampilkan form untuk menambahkan kost baru
     public function create()
     {
+
         return view('owner.kostCreate');
     }
 
@@ -51,10 +130,13 @@ class KostController extends Controller
         ]);
 
         // Menyimpan gambar
-        $foto_bangunan_utama = $request->file('foto_bangunan_utama')->store('public/foto_kost');
-        $foto_kamar = $request->file('foto_kamar')->store('public/foto_kost');
-        $foto_kamar_mandi = $request->file('foto_kamar_mandi')->store('public/foto_kost');
-        $foto_interior = $request->file('foto_interior')->store('public/foto_kost');
+        // Menyimpan gambar di subfolder masing-masing
+        $foto_bangunan_utama = $request->file('foto_bangunan_utama')->store('foto_kost/foto_bangunan_utama', 'public');
+        $foto_kamar = $request->file('foto_kamar')->store('foto_kost/foto_kamar', 'public');
+        $foto_kamar_mandi = $request->file('foto_kamar_mandi')->store('foto_kost/foto_kamar_mandi', 'public');
+        $foto_interior = $request->file('foto_interior')->store('foto_kost/foto_interior', 'public');
+
+
 
         // Menyimpan data kost dengan path gambar
         $kost = Kost::create([
@@ -89,7 +171,7 @@ class KostController extends Controller
         // Simpan ke database
         $kost->save();
 
-        return redirect()->route('kost.index')->with('success', 'Data kost berhasil ditambahkan');
+        return redirect()->route('kost.index1')->with('success', 'Data kost berhasil ditambahkan');
     }
 
 
@@ -128,14 +210,14 @@ class KostController extends Controller
         ]);
 
         $kost->update($request->all());
-        return redirect()->route('kost.index')->with('success', 'Kost berhasil diperbarui');
+        return redirect()->route('kost.index1')->with('success', 'Kost berhasil diperbarui');
     }
 
     // Menghapus data kost
     public function destroy(Kost $kost)
     {
         $kost->delete();
-        return redirect()->route('kost.index')->with('success', 'Kost berhasil dihapus');
+        return redirect()->route('kost.index1')->with('success', 'Kost berhasil dihapus');
     }
 }
 

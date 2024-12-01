@@ -19,18 +19,22 @@
 </head>
 <body class="flex min-h-screen">
     <!-- Sidebar -->
-    <div class="w-auto">
+    <aside class="w-60 text-white fixed h-full">
         @include('admin.template.sidebar')
-    </div>
+    </aside>
 
     <!-- Konten -->
-    <div class="flex-grow p-6 bg-gray-100">
-        <h1 class="text-2xl font-bold mb-4">Daftar Pengguna</h1>
+    <div class="flex-grow ml-60 p-4 bg-white overflow-y-auto">
+        <h1 class="text-2xl font-bold mb-4 text-center">Daftar Pengguna</h1>
 
         <!-- Tombol Tambah User -->
         <a href="{{route('admin.user.create')}}" class="mb-4 inline-block bg-green-500 text-white px-4 py-2 rounded hover:bg-yellow-400">
             Tambah User
         </a>
+        <button onclick="printTable()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+            Cetak Laporan
+        </button>
+        
 
         <table id="users-table" class="min-w-full bg-white border border-gray-300">
             <thead>
@@ -92,6 +96,36 @@
                 "pageLength": 10, // Default rows per page
             });
         });
+
+        function printTable() {
+        const table = document.getElementById('users-table').outerHTML;
+        const printWindow = window.open('', '', 'height=600,width=800');
+        printWindow.document.write('<html><head><title>Cetak Laporan User</title>');
+        printWindow.document.write('<style>');
+        printWindow.document.write(`
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin: 20px 0;
+                font-size: 16px;
+                text-align: left;
+            }
+            table, th, td {
+                border: 1px solid #ddd;
+                padding: 8px;
+            }
+            th {
+                background-color: #f4f4f4;
+                font-weight: bold;
+            }
+        `);
+        printWindow.document.write('</style></head><body>');
+        printWindow.document.write('<h1 style="text-align:center;">Laporan Daftar User</h1>');
+        printWindow.document.write(table);
+        printWindow.document.write('</body></html>');
+        printWindow.document.close();
+        printWindow.print();
+    }
     </script>
 </body>
 </html>

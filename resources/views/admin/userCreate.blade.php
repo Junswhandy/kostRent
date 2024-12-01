@@ -11,12 +11,12 @@
 </head>
 <body class="flex min-h-screen">
     <!-- Sidebar -->
-    <div class="w-64">
+    <aside class="w-60 text-white fixed h-full">
         @include('admin.template.sidebar')
-    </div>
+    </aside>
 
     <!-- Konten -->
-    <div class="flex-grow p-6 bg-gray-100">
+    <div class="flex-grow bg-gray-100 ml-60 p-4 overflow-y-auto">
         <h1 class="text-2xl font-bold mb-6">Tambah User</h1>
 
         <form action="{{ route('admin.user.store') }}" method="POST" enctype="multipart/form-data" class="bg-white p-6 rounded shadow-md">

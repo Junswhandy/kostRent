@@ -14,9 +14,11 @@
 <body class="h-screen bg-gray-100">
     <div class="flex h-full">
         <!-- Sidebar -->
-        @include('owner.template.sidebar')
+        <aside class="w-60 text-white fixed h-full">
+            @include('owner.template.sidebar')
+        </aside>
 
-        <div class="flex-grow p-8">
+        <div class="flex-grow ml-64 p-6 bg-white overflow-y-auto">
             <h1 class="text-3xl font-bold mb-6">Tambah Kost</h1>
 
             <!-- Form Tambah Kost -->

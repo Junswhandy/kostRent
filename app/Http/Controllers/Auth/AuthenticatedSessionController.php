@@ -55,12 +55,22 @@ class AuthenticatedSessionController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
+        // Dapatkan user_id dari pengguna yang sedang login
+        $userId = Auth::id();
+
+        // Hapus semua session yang terkait dengan user_id ini
+        DB::table('sessions')->where('user_id', $userId)->delete();
+
+        // Logout pengguna
         Auth::guard('web')->logout();
 
+        // Invalidate session saat ini
         $request->session()->invalidate();
 
+        // Regenerate token untuk keamanan
         $request->session()->regenerateToken();
 
+        // Redirect ke halaman utama
         return redirect('/');
     }
 }

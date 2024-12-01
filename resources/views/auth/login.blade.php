@@ -53,6 +53,9 @@
             <div class="text-center mt-6">
                 <p>Don't have an account? <a href="{{ route('register') }}" class="text-indigo-500 font-bold hover:underline">Register</a></p>
             </div>
+            <div class="text-center mt-6">
+                <p><a href="{{ route('home') }}" class="text-indigo-500 font-bold hover:underline">Home</a></p>
+            </div>
         </div>
     </div>
 

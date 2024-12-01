@@ -1,82 +1,85 @@
-<x-guest-layout>
-    <form method="POST" action="{{ route('register') }}" enctype="multipart/form-data">
-        @csrf
 
-        <!-- Name -->
-        <div>
-            <x-input-label for="name" :value="__('Name')" />
-            <x-text-input id="name" class="block mt-1 w-full" type="text" name="name" :value="old('name')" required autofocus autocomplete="name" />
-            <x-input-error :messages="$errors->get('name')" class="mt-2" />
-        </div>
 
-        <!-- Email Address -->
-        <div class="mt-4">
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
-        </div>
-<!-- Level -->
-<div>
-    <label for="level">Level</label>
-    <select id="level" name="level">
-        <option value="user">User</option>
-        <option value="admin">Admin</option>
-        <option value="owner">Owner</option>
-    </select>
-</div>
-        <!-- Password -->
-        <div class="mt-4">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Tambah User</title>
+    <!-- Tambahkan Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    @vite('resources/css/app.css')
+</head>
+<body class="flex min-h-screen">
+
+    <!-- Konten -->
+    <div class="flex-grow p-6 bg-gray-100">
+        <h1 class="text-2xl font-bold mb-6">Tambah User</h1>
+
+        <form method="POST" action="{{ route('register') }}" enctype="multipart/form-data">
+            @csrf
+            <div class="mb-4">
+                <label for="name" class="block text-gray-700">Nama</label>
+                <input type="text" id="name" name="name" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200">
+            </div>
+
+            <div class="mb-4">
+                <label for="email" class="block text-gray-700">Email</label>
+                <input type="email" id="email" name="email" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200">
+            </div>
+
+           <!-- Password -->
+        <div class="mb-4">
             <x-input-label for="password" :value="__('Password')" />
             <x-text-input id="password" class="block mt-1 w-full" type="password" name="password" required autocomplete="new-password" />
             <x-input-error :messages="$errors->get('password')" class="mt-2" />
         </div>
 
         <!-- Confirm Password -->
-        <div class="mt-4">
+        <div class="mb-4">
             <x-input-label for="password_confirmation" :value="__('Confirm Password')" />
             <x-text-input id="password_confirmation" class="block mt-1 w-full" type="password" name="password_confirmation" required autocomplete="new-password" />
             <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
         </div>
 
-        <!-- No HP -->
-        <div class="mt-4">
-            <x-input-label for="no_hp" :value="__('No HP')" />
-            <x-text-input id="no_hp" class="block mt-1 w-full" type="text" name="no_hp" :value="old('no_hp')" autocomplete="no_hp" />
-            <x-input-error :messages="$errors->get('no_hp')" class="mt-2" />
-        </div>
+            <div class="mb-4">
+                <label for="level" class="block text-gray-700">Level</label>
+                <select id="level" name="level" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200">
+                    <option value="user">User</option>
+                    <option value="admin">Admin</option>
+                    <option value="owner">Owner</option>
+                </select>
+            </div>
 
-        <!-- Pekerjaan -->
-        <div class="mt-4">
-            <x-input-label for="pekerjaan" :value="__('Pekerjaan')" />
-            <x-text-input id="pekerjaan" class="block mt-1 w-full" type="text" name="pekerjaan" :value="old('pekerjaan')" autocomplete="pekerjaan" />
-            <x-input-error :messages="$errors->get('pekerjaan')" class="mt-2" />
-        </div>
+            <div class="mb-4">
+                <label for="no_hp" class="block text-gray-700">No. HP</label>
+                <input type="text" id="no_hp" name="no_hp" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200">
+            </div>
 
-        <!-- Jenis Kelamin -->
-        <div class="mt-4">
-            <x-input-label for="jenis_kelamin" :value="__('Jenis Kelamin')" />
-            <select id="jenis_kelamin" name="jenis_kelamin" class="block mt-1 w-full">
-                <option value="laki-laki" {{ old('jenis_kelamin') == 'laki-laki' ? 'selected' : '' }}>Laki-Laki</option>
-                <option value="perempuan" {{ old('jenis_kelamin') == 'perempuan' ? 'selected' : '' }}>Perempuan</option>
-            </select>
-            <x-input-error :messages="$errors->get('jenis_kelamin')" class="mt-2" />
-        </div>
+            <div class="mb-4">
+                <label for="pekerjaan" class="block text-gray-700">Pekerjaan</label>
+                <input type="text" id="pekerjaan" name="pekerjaan" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200">
+            </div>
 
-        <!-- Foto Profil -->
-        <div class="mt-4">
-            <x-input-label for="foto_profil" :value="__('Foto Profil')" />
-            <input id="foto_profil" class="block mt-1 w-full" type="file" name="foto_profil" accept="image/*" />
-            <x-input-error :messages="$errors->get('foto_profil')" class="mt-2" />
-        </div>
+            <div class="mb-4">
+                <label for="jenis_kelamin" class="block text-gray-700">Jenis Kelamin</label>
+                <select id="jenis_kelamin" name="jenis_kelamin" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200">
+                    <option value="laki-laki">Laki-laki</option>
+                    <option value="perempuan">Perempuan</option>
+                </select>
+            </div>
 
-        <div class="flex items-center justify-end mt-4">
-            <a class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800" href="{{ route('login') }}">
-                {{ __('Already registered?') }}
-            </a>
+            <div class="mb-4">
+                <label for="foto_profil" class="block text-gray-700">Foto Profil</label>
+                <input type="file" id="foto_profil" name="foto_profil" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200">
+            </div>
 
-            <x-primary-button class="ms-4">
-                {{ __('Register') }}
-            </x-primary-button>
-        </div>
-    </form>
-</x-guest-layout>
+            <div>
+                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Simpan</button>
+                <a href="{{ route('home') }}" class="ml-4 text-gray-600">Batal</a>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

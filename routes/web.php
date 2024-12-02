@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\KostController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\userKostController;
-// Home Controller
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\KonfirmasiBayarController;
 
@@ -32,7 +31,6 @@ Route::post('/logout', function () {
 Route::get('register', [RegisteredUserController::class, 'create'])
     ->name('register')
     ->middleware('guest'); // Hanya dapat diakses oleh pengguna tamu
-
 Route::post('register', [RegisteredUserController::class, 'store']);
 
 // Password Reset Routes
@@ -58,21 +56,15 @@ Route::middleware(['auth'])->group(function () {
         return view('admin.dashboard'); // Tampilan dashboard Admin
     })->middleware('role:admin')->name('admin.dashboard');
 
-    // Route::get('/user', function () {
-    //     return view('user.dashboard'); // Tampilan dashboard User
-    // })->middleware('role:user')->name('user.dashboard');
-
     // Rute untuk halaman dashboard owner
     Route::get('/owner', action: [KostController::class, 'index'])
         ->middleware('role:owner') // Menambahkan middleware untuk hanya akses role owner
         ->name('owner.dashboard'); // Nama rute untuk dashboard owner
 
-
     Route::get('/user', action: [KostController::class, 'indexUser'])
         ->middleware('role:user') // Menambahkan middleware untuk hanya akses role owner
         ->name('user.dashboard'); // Nama rute untuk dashboard user
 });
-
 
 // admin role
 Route::get('/admin/kost', [KostController::class, 'indexAdmin'])->name('admin.kost');
@@ -103,10 +95,10 @@ Route::get('/owner/kost/create', [KostController::class, 'create'])->name('kost.
 Route::post('/owner/kost', [KostController::class, 'store'])->name('kost.store');
 
 // Route untuk form edit kost
-Route::get('/owner/kost/{id}/edit', [KostController::class, 'edit'])->name('kost.edit');
+Route::get('/owner/kost/{id_kost}', [KostController::class, 'edit'])->name('kost.edit');
 
 // Route untuk update data kost
-Route::put('/owner/kost/{id}', [KostController::class, 'update'])->name('kost.update');
+Route::put('/owner/kost/{id_kost}', [KostController::class, 'update'])->name('kost.update');
 
 Route::delete('/kost/{kost}', [KostController::class, 'destroy'])->name('kost.destroy');
 // Menampilkan detail kost berdasarkan ID
@@ -114,14 +106,13 @@ Route::get('/owner/kost/{id}', [KostController::class, 'show'])->name('owner.kos
 
 Route::get('/owner/user', [UserController::class, 'index'])->name('owner.user');
 
-
-// user
-
+// BAGIAN USER
 Route::get('/user/kost/{id}', [KostController::class, 'showUser'])->name('user.kost.show');
 use App\Http\Controllers\BookingController;
 
 Route::post('/user/kost/booking', [BookingController::class, 'store'])->name('booking.store');
 
+// rute untuk menangani konfirmasi
 Route::middleware(['auth', 'role:user'])->group(function () {
     Route::get('/konfirmasi', [KonfirmasiBayarController::class, 'index'])->name('konfirmasi.index');
     Route::post('/konfirmasi/upload', [KonfirmasiBayarController::class, 'upload'])->name('konfirmasi.upload');
@@ -137,6 +128,3 @@ Route::post('/owner/booking/confirm', [BookingController::class, 'confirm'])->na
 
 // Rute untuk menolak booking
 Route::post('/owner/booking/reject', [BookingController::class, 'reject'])->name('owner.booking.reject');
-
-
-// route filtering

@@ -5,7 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\Kost;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rules;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Hash;
 class KostController extends Controller
 {
 
@@ -176,15 +180,20 @@ class KostController extends Controller
 
 
     // Menampilkan form untuk mengedit kost
-    public function edit(Kost $kost)
+    public function edit($id_kost)
     {
-        return view('kost.edit', compact('kost'));
+        $kost = Kost::findOrFail($id_kost);
+        return view('owner.kostEdit', compact('kost'));
     }
 
+
     // Memperbarui data kost
-    public function update(Request $request, Kost $kost)
+    public function update(Request $request, $id_kost)
     {
-        $request->validate([
+        $kost = Kost::findOrFail($id_kost);
+
+        // Validasi input
+        $validator = Validator::make($request->all(), [
             'nama_kost' => 'required|string|max:255',
             'tipe_kost' => 'required|string|max:255',
             'jenis_kost' => 'required|string|max:255',
@@ -193,10 +202,10 @@ class KostController extends Controller
             'nama_pemilik' => 'required|string',
             'nama_bank' => 'required|string',
             'no_rekening' => 'required|string|max:50',
-            'foto_bangunan_utama' => 'required|string|max:255',
-            'foto_kamar' => 'required|string|max:255',
-            'foto_kamar_mandi' => 'required|string|max:255',
-            'foto_interior' => 'required|string|max:255',
+            'foto_bangunan_utama' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'foto_kamar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'foto_kamar_mandi' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'foto_interior' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'provinsi' => 'required|string|max:25',
             'kota' => 'required|string|max:25',
             'kecamatan' => 'required|string|max:25',
@@ -209,9 +218,60 @@ class KostController extends Controller
             'link_gmaps' => 'nullable|string',
         ]);
 
-        $kost->update($request->all());
-        return redirect()->route('kost.index1')->with('success', 'Kost berhasil diperbarui');
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
+        // Update data kost
+        $kost->nama_kost = $request->nama_kost;
+        $kost->tipe_kost = $request->tipe_kost;
+        $kost->jenis_kost = $request->jenis_kost;
+        $kost->jumlah_kamar = $request->jumlah_kamar;
+        $kost->tanggal_tagih = $request->tanggal_tagih;
+        $kost->nama_pemilik = $request->nama_pemilik;
+        $kost->nama_bank = $request->nama_bank;
+        $kost->no_rekening = $request->no_rekening;
+        $kost->provinsi = $request->provinsi;
+        $kost->kota = $request->kota;
+        $kost->kecamatan = $request->kecamatan;
+        $kost->kelurahan = $request->kelurahan;
+        $kost->alamat = $request->alamat;
+        $kost->harga_sewa = $request->harga_sewa;
+        $kost->kontak = $request->kontak;
+        $kost->deskripsi = $request->deskripsi;
+        $kost->fasilitas_kost = $request->fasilitas_kost;
+        $kost->link_gmaps = $request->link_gmaps;
+
+        // Handling foto (jika ada file yang diupload)
+        if ($request->hasFile('foto_bangunan_utama')) {
+            $foto_bangunan_utama = $request->file('foto_bangunan_utama')->store('foto_kost/foto_bangunan_utama', 'public');
+            $kost->foto_bangunan_utama = $foto_bangunan_utama;
+        }
+
+        if ($request->hasFile('foto_kamar')) {
+            $foto_kamar = $request->file('foto_kamar')->store('foto_kost/foto_kamar', 'public');
+            $kost->foto_kamar = $foto_kamar;
+        }
+
+        if ($request->hasFile('foto_kamar_mandi')) {
+            $foto_kamar_mandi = $request->file('foto_kamar_mandi')->store('foto_kost/foto_kamar_mandi', 'public');
+            $kost->foto_kamar_mandi = $foto_kamar_mandi;
+        }
+
+        if ($request->hasFile('foto_interior')) {
+            $foto_interior = $request->file('foto_interior')->store('foto_kost/foto_interior', 'public');
+            $kost->foto_interior = $foto_interior;
+        }
+
+        // Simpan perubahan
+        $kost->save();
+
+        return redirect()->route('kost.index1')->with('success', 'Data kost berhasil diperbarui');
     }
+
+
+
+
 
     // Menghapus data kost
     public function destroy(Kost $kost)
